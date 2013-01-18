@@ -24,11 +24,14 @@ This file is part of the Scratch Remote Sensor Library project
 '''
 
 import logging
+import time
 import RPi.GPIO as GPIO
 
 from scratch.remotesensor import RemoteSensor 
 
 rs = None
+
+inputs = []
 
 def setupPins():
 
@@ -41,6 +44,15 @@ def setupPins():
 		rs.values.set("DIO%d" % pin, 0)
 		rs.values.set("IO%d" % pin, 0)
 			
+def inputMonitor():
+
+	for pin in inputs:
+
+		i = GPIO.input(pin)
+
+		if i != rs.values.get("IO%d" % pin):
+			rs.values.set("IO%d" % pin, i)
+
 def updateHandler(var, val):
 	'''
 	Handler called for incoming sensor-updates ...
@@ -55,11 +67,15 @@ def updateHandler(var, val):
 			pin = int(var[3:])
 
 			if val == 0:
-				loggin.debug("Setting %s as OUTPUT" % vu)
+				logging.debug("Setting %s as OUTPUT" % vu)
 				GPIO.setup(pin, GPIO.OUT)	
+				inputs[:] = (value for value in inputs if value != pin)
+				logging.debug("Currently monitored inputs: %s" % inputs)
 			elif val == 1:
-				loggin.debug("Setting %s as INPUT" % vu)
+				logging.debug("Setting %s as INPUT" % vu)
 				GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)	
+				inputs.append(pin)
+				logging.debug("Currently monitored inputs: %s" % inputs)
 			else:
 				logging.warn("Unknown direction %d for pin %s" % (val, vu))
 
@@ -78,12 +94,6 @@ def updateHandler(var, val):
 		logging.warn("Allowed value for %s is only 0 or 1 (was %s)" % (val, vu))
 
 
-def messageHandler(t, msg):
-	'''
-	Handler called for incoming broadcast messages ... 
-	'''
-	pass
-
 try:
 	# Configure logging for RemoteSensor to show DEBUG messages ...
 	logging.basicConfig(
@@ -93,20 +103,24 @@ try:
 	)
 
 	# Remote sensor connected to default host/port (localhost:42001)
-	rs = RemoteSensor()
+	rs = RemoteSensor('172.16.100.21')
+
+	setupPins()
 
 	# Register callback handler for sensor-updates
 	rs.updateHandler  = updateHandler
 
-	# Register callback handler for broadcast messages
-	rs.messageHandler = messageHandler
-	
 	# Start receiver thread
 	rs.start()
-	
-	setupPins()
 
-	raw_input('Press Enter to quit...\n')
+	while True:
+
+		try:
+			inputMonitor()
+			time.sleep(0.1)
+
+		except KeyboardInterrupt:
+			break
 	
 except Exception as e:
 	print(e)

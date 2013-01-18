@@ -55,11 +55,13 @@ def updateHandler(var, val):
 			pin = int(var[3:])
 
 			if val == 0:
+				loggin.debug("Setting %s as OUTPUT" % vu)
 				GPIO.setup(pin, GPIO.OUT)	
 			elif val == 1:
-				GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)	
+				loggin.debug("Setting %s as INPUT" % vu)
+				GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)	
 			else:
-				logging.warn("Unknown direction %s for pin %s" % (pin, vu))
+				logging.warn("Unknown direction %d for pin %s" % (val, vu))
 
 		elif vu in ["IO4", "IO17", "IO18", "IO21", "IO22", "IO23", "IO24", "IO25" ]:
 
@@ -70,10 +72,10 @@ def updateHandler(var, val):
 			elif val == 1:
 				GPIO.output(pin, GPIO.HIGH)
 			else:
-				logging.warn("Unknown setting%s for pin %s" % (pin, vu))
+				logging.warn("Unknown setting %d for pin %s" % (val, vu))
 
 	else:
-		logging.warn("Allowed value for %s is 0 or 1 (was %s)" % (val, vu))
+		logging.warn("Allowed value for %s is only 0 or 1 (was %s)" % (val, vu))
 
 
 def messageHandler(t, msg):

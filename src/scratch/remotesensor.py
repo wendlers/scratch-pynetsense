@@ -21,6 +21,37 @@
 
 '''
 This file is part of the Scratch Remote Sensor Library project
+
+Minimal Usage example:
+----------------------
+
+from scratch.remotesensor import RemoteSensor 
+
+try:
+	# Remote sensor connected to default host/port (localhost:42001)
+	rs = RemoteSensor()
+
+	# Start receiver thread
+	rs.start()
+	
+	# Create new sensor variable 'a', set value to 1. This will result
+    # in a 'sensor-update' message sent to Scratch sensor server. 
+	rs.values.a = 1 
+
+	# Create an other variable
+	rs.values.b = 0.2 
+
+	# An yet an other ...
+	rs.values.x = "dynamic sensor-update"
+
+	# Broadcast a message ...
+	rs.bcastMsg('foobar')
+
+	raw_input('Press Enter to quit...\n')
+	
+except Exception as e:
+	print(e)
+
 '''
 
 import struct
@@ -37,26 +68,64 @@ class SensorValues:
 	'''
 	Value holder class for remote sensor values. Every time a new value is assigned to a
 	variable, a remote sensor update is sent to the server (via network).
+
+	This class is used inernally within the @RemoteSensor class.
 	'''
 	
 	sensorClient = None
 
 	def __init__(self, sensorClient):
+		'''
+		Construct a new sensor value holder.
+
+		@param	sensorClient	reference to @RemoteSensor client instance	
+		'''
 		self.__setInternal("sensorClient", sensorClient)
 
 	def __setInternal(self, name, value):
+		'''
+		Set value of named variable only in internal dictionary (don't send
+		update message to sensor server).
+
+		@param	name	name of variable to assign a value
+		@param	value	value to be assigned
+		'''
 		self.__dict__[name] = value
 
 	def __setattr__(self, name, value):
+		'''
+		Overwrite variable assignment in a way, that not only the value of
+		is set, but also a update message to the sensor server is send. 
+		Thus, whenever using 'valueHolder.var = value' is called, a
+		'sensor-update "var" value' is sent to the server. 
+
+		@param	name	name of variable to assign a value
+		@param	value	value to be assigned
+		'''
 		self.set(name, value)
 
 	def set(self, name, value, updateRemote = True):
+		'''
+		Set value of a named variable, decide if update message is sent or not.
+
+		@param	name			name of variable to assign a value
+		@param	value			value to be assigned
+		@param	updateRemote	if True, send update message
+		'''
 		self.__setInternal(name, value)
 
 		if updateRemote:
 			self.sensorClient.sendMsg('sensor-update', varName=name, varValue=value)
 		
 	def get(self, name):
+		'''
+		Get value assigned to a named variable.
+
+		Throws an exception if variable does not exist (because nothing was assigned to it yet).
+
+		@param	nam		name of variable to get the value
+		@return			currently assigned variable value		
+		'''
 		return self.__dict__[name] 
 
 class RemoteSensor(threading.Thread):
@@ -64,15 +133,22 @@ class RemoteSensor(threading.Thread):
 	Implementation of the Scratch Remote Sensor protocol.
 	'''
 
-	__sock = None
-	values = None
+	__sock = None			# TCP socket to communicate to server
+	values = None			# holds an instance of @SensorValues
 
-	updateHandler  = None
-	messageHandler = None
+	updateHandler  = None	# Call back handler for sensor updates
+	messageHandler = None	# Call back handler for message updates
 
 	def __init__(self, host = DEFAULT_HOST, port = DEFAULT_PORT):
+		'''
+		Construct new remote sensor connected to given server on given port.
+		If server is not reachable, an exception is thrown.
 
-		logging.info("Connection to %s:%d" % (host, port))
+		@param	host	IP/hostname of Scratch sensor server
+		@param	port	port of Scratch sensor server
+		'''
+
+		logging.info("Connecting to Scratch at %s:%d" % (host, port))
 
 		RemoteSensor.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		RemoteSensor.__sock.connect((host, port))
@@ -83,6 +159,9 @@ class RemoteSensor(threading.Thread):
 		self.values = SensorValues(self)
 
 	def __del__(self):
+		'''
+		Destructor for remote sensor
+		'''
 
 		try:
 			RemoteSensor.__sock.close()
@@ -90,6 +169,19 @@ class RemoteSensor(threading.Thread):
 			pass
 
 	def sendMsg(self, msgType, message = None, varName=None, varValue=None, **msgParam):
+		'''
+		Send generic message to sensor server. 
+
+		@param	msgType		message type ('sensor-update' or 'broadcast')
+		@param	message		if msgType is 'broadcast' this holds the massage to send
+		@param	varName		if msgType is 'sensor-update', and only one variable should be
+							broadcasted, this holds the variable name
+		@param	varVale		if msgType is 'sensor-update', and only one variable should be
+							broadcasted, this holds the variable vale 
+		@param	**msgParam	if msgType is 'sensor-update', and many variables should be
+							broadcasted, they could be specified here as key-value pairs
+							(e.g. x=1, y=2, ...) 
+		'''
 
 		msg = msgType
 
@@ -127,6 +219,11 @@ class RemoteSensor(threading.Thread):
 		RemoteSensor.__sock.sendall(msg)
 
 	def recvMsg(self):
+		'''
+		Wait (blocking) for an incoming message. This method is used within the receiver thread.
+
+		@return	received message (raw)
+		'''
 
 		msg = RemoteSensor.__sock.recv(4)
 
@@ -143,6 +240,16 @@ class RemoteSensor(threading.Thread):
 		return msg 
 
 	def parseMsg(self, msg):
+			'''
+			Parse a message received from the server. For messages of type 'sensor-update' the
+			value of the corresponding variable int the value holder instance is set. If a 
+			callback handler (updateHandler) is assigned, this handler is called. 
+
+			For messages of type 'broadcast', the callback handler (messageHandler) is called
+			if assigned.
+
+			@param	msg		raw message as received from server
+			'''
 	
 			logging.debug("Incoming message: %s" % msg)
 
@@ -204,10 +311,18 @@ class RemoteSensor(threading.Thread):
 				logging.warn("Unsupported message type: %s" % mtype)
 
 	def bcastMsg(self, msg):
+		'''
+		Broadcast a message to the server.
+
+		@param	msg		message to broadcast
+		'''
 
 		self.sendMsg('broadcast', msg)
 
 	def run(self):
+		'''
+		Run method called when thread is started.
+		'''
 
 		while True:
 

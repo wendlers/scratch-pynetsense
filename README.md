@@ -3,7 +3,7 @@ Scratch Networking Sensor Client Library for Python
 15.01.2013 Stefan Wendler
 sw@kaltpost.de
 
-This python library provides a simple to use API for implementing [Scratch] (http://scratch.mit.edu/) networking sensor clients. For communicating with Scratch, the [remote seonsor protocol is used] (http://wiki.scratch.mit.edu/wiki/Remote_Sensors_Protocol).  
+This python library provides a simple to use API for implementing [Scratch] (http://scratch.mit.edu/) networking sensor clients. For communicating with Scratch, the [remote sensor protocol is used] (http://wiki.scratch.mit.edu/wiki/Remote_Sensors_Protocol).  
 
 From the Scratch Wiki:
 
@@ -14,15 +14,15 @@ From the Scratch Wiki:
 	Once a connection is established, messages are sent in both directions 
 	over the socket connection.
 
-In other words, this means, that one could share global Scratch variables amoung all remote sensor clients connected to Scratch. The same is true for Scratch messages: they are broadcasted to all clients. For example: 
+In other words, this means, that one could share global Scratch variables among all remote sensor clients connected to Scratch. The same is true for Scratch messages: they are broadcasted to all clients. For example: 
 
-* A remote sensor client instance connectes to scratch
-* The user defines a global variable X in Scratch and assigns the value 1 to it
-* Thie imidiateley results in a sensor update message sent to the client notifying it, that there is a varaibale X with a value of 1 assigned to it.
+* A remote sensor client instance connects to scratch.
+* The user defines a global variable X in Scratch and assigns the value 1 to it.
+* This  results in a sensor update message sent to the client notifying it, that there is a variable X with a value of 1 assigned to it.
 
-Note: it is also posible that the client introduces a new variable and assignes a value to it. The variable will be imidiately introduced to Scratch by an update message.
+Note: it is also possible that the client introduces a new variable and assigns a value to it. The variable will be  introduced to Scratch by an update message.
 
-An update message is sent every time the value of the variable changed eighter by the client or by the server (Scratch).
+An update message is sent every time the value of the variable changed  by the client or by the server (Scratch).
 
 Also messages could be sent from Scratch to remote sensors and vice versa. 
 
@@ -85,23 +85,23 @@ API Usage
 
 Before you start using the API, make sure, Scratch is running, and the remote sensor protocol is activated (by using the right click menu on one of the sensor blocks). 
 
-First, the remote sensor module neeeds to be imported:
+First, the remote sensor module needs to be imported:
 
-	from scratch.remotesensor import RemoteSensor 
+	from scratch.remote sensor import RemoteSensor 
 
-Now, a new `RemoteSensor` instance needs to be created. If you intend to connect to a Scratch instance running on the same machine as your API programm, the host and port parameters could be omitted:
+Now, a new `RemoteSensor` instance needs to be created. If you intend to connect to a Scratch instance running on the same machine as your API program, the host and port parameters could be omitted:
 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
 
-To receive updates and messges, the receiver thread needs to be started:
+To receive updates and messages, the receiver thread needs to be started:
 
 	# Start receiver thread
 	rs.start()
 	
-To introduce a new varaible, or assigne a new value to a already introduced variable, just assign the desired value to it:
+To introduce a new variable, or assign a new value to a already introduced variable, just assign the desired value to it:
 
-	# Create new sensor variable 'a', set value to 1. This will tesult
+	# Create new sensor variable 'a', set value to 1. This will result
     # in a 'sensor-update' message sent to Scratch sensor server. 
 	rs.values.a = 1 
 
@@ -118,7 +118,9 @@ To sent a message use the following:
 	# Broadcast a message ...
 	rs.bcastMsg('foobar')
 
-To get notified about incoming broadcast messages or variable updates, register callback handlers:
+To get notified about incoming broadcast messages or variable updates, register call back handlers:
+
+	from scratch.remote sensor import RemoteSensor 
 
 	def updateHandler(var, val):
 		'''
@@ -135,14 +137,18 @@ To get notified about incoming broadcast messages or variable updates, register 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
 
-	# Register callback handler for sensor-updates
+	# Register call back handler for sensor-updates
 	rs.updateHandler  = updateHandler
 
-	# Register callback handler for broadcast messages
+	# Register call back handler for broadcast messages
 	rs.messageHandler = messageHandler
 	
 	# Start receiver thread
 	rs.start()
 	
-Now, every time a variable gets updated or a new message is received, the coresponding handler is called.
+	# Receiver thread is a daemon thread, thus we need to make sure that the main 
+	# program does not exit while we are note done ...
+	raw_input('Press Enter to quit...\n')
+
+Now, every time a variable gets updated or a new message is received, the corresponding handler is called.
 

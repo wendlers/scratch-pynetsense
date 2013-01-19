@@ -77,7 +77,7 @@ could do the following:
 
 Note: you could use the examples against the dummy server implementation provided with this library. To start the dummy server, issue the following from the projects top-level directory (before running the examples):
 
-	./bin/rsdummysrv
+	python src/scratch/rsdummysrv.py
 
 
 API Usage
@@ -93,6 +93,7 @@ Now, a new `RemoteSensor` instance needs to be created. If you intend to connect
 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
+	rs.connect()
 
 To receive updates and messages, the receiver thread needs to be started:
 

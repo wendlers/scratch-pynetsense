@@ -49,6 +49,7 @@ try:
 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
+	rs.connect()
 
 	# Register callback handler for sensor-updates
 	rs.updateHandler  = updateHandler

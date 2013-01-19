@@ -30,6 +30,7 @@ from scratch.remotesensor import RemoteSensor
 try:
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
+	rs.connect()
 
 	# Start receiver thread
 	rs.start()
@@ -60,6 +61,7 @@ import sys
 import threading
 import thread
 import logging
+import time
 
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = 42001
@@ -133,8 +135,12 @@ class RemoteSensor(threading.Thread):
 	Implementation of the Scratch Remote Sensor protocol.
 	'''
 
-	__sock = None			# TCP socket to communicate to server
-	values = None			# holds an instance of @SensorValues
+	__sock 			= None	# TCP socket to communicate to server
+	__stopRcvThread = None	# Controll flag for receiver thread 
+	__host			= None	# Sensor server host
+	__port			= None	# Sensor server port
+
+	values 			= None	# holds an instance of @SensorValues
 
 	updateHandler  = None	# Call back handler for sensor updates
 	messageHandler = None	# Call back handler for message updates
@@ -148,15 +154,54 @@ class RemoteSensor(threading.Thread):
 		@param	port	port of Scratch sensor server
 		'''
 
-		logging.info("Connecting to Scratch at %s:%d" % (host, port))
-
-		RemoteSensor.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		RemoteSensor.__sock.connect((host, port))
-
+		self.__host = host
+		self.__port = port
+	
 		threading.Thread.__init__(self)
 		self.daemon = True
 
 		self.values = SensorValues(self)
+
+	def connect(self, tryHard = False):
+
+		logging.info("Connecting to Scratch at %s:%d" % (self.__host, self.__port))
+
+		if tryHard:
+
+			while True:
+				try:
+					RemoteSensor.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+					RemoteSensor.__sock.connect((self.__host, self.__port))
+					break
+				except socket.error:
+					logging.info("Connect failed. Retrying in 2 sec.!")
+					try:
+						time.sleep(2)
+					except KeyboardInterrupt:
+						exit(0)
+				except KeyboardInterrupt:
+					exit(0)
+
+		else:
+			RemoteSensor.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			RemoteSensor.__sock.connect((self.__host, self.__port))
+
+		logging.info("Successfully connected!")
+
+	def shutdown(self):
+	
+		if self.__stopRcvThread == None:
+			return
+
+		logging.info("Shutting down connection to Scratch")
+
+		self.__stopRcvThread = True 
+
+		try:
+			self.__sock.shutdown()
+			self.__sock.close()
+		except:
+			pass
 
 	def __del__(self):
 		'''
@@ -324,11 +369,21 @@ class RemoteSensor(threading.Thread):
 		Run method called when thread is started.
 		'''
 
-		while True:
+		self.__stopRcvThread = False
 
-			msg = self.recvMsg()
-	
-			if not msg:
-				break
 
-			self.parseMsg(msg)
+		while not self.__stopRcvThread:
+
+			try:
+				msg = self.recvMsg()
+		
+				if not msg:
+					time.sleep(0.1)	
+				else:
+					self.parseMsg(msg)
+
+			except:
+				pass
+
+		self.__stopRcvThread = None 
+

@@ -37,6 +37,7 @@ try:
 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
+	rs.connect()
 
 	# Start receiver thread
 	rs.start()

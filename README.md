@@ -137,7 +137,8 @@ To get notified about incoming broadcast messages or variable updates, register 
 
 	# Remote sensor connected to default host/port (localhost:42001)
 	rs = RemoteSensor()
-
+	rs.connect()
+	
 	# Register call back handler for sensor-updates
 	rs.updateHandler  = updateHandler
 

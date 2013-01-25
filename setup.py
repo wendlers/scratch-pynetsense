@@ -25,6 +25,9 @@
 This file is part of the Scratch Remote Sensor Library project
 '''
 
+import os
+import shutil
+
 from distutils.core import setup
 
 setup(name='scratch-pynetsense',
@@ -35,7 +38,40 @@ setup(name='scratch-pynetsense',
 	author_email='sw@usherpa.org',
 	url='http://www.usherpa.org/',
 	license='LGPL 2.1',
-	packages=['scratch'],
+	packages=['scratch', 'scratch.wrappers'],
 	platforms=['Linux'],
 	package_dir = {'': 'src'}
 )
+
+# install wrapper scripts 
+base   = "/usr/local/bin"
+srsmon = "%s/srsmon" % base
+srspid = "%s/srspid" % base
+srsds  = "%s/srsds"  % base
+
+scratch = "%s/scratch-pirs"  % base
+
+try:
+	shutil.copyfile("./bin/srsmon", srsmon)
+	os.chmod(srsmon, 0755)
+except:
+	pass
+
+try:
+	shutil.copyfile("./bin/srspid", srspid)
+	os.chmod(srspid, 0755)
+except:
+	pass
+
+try:
+	shutil.copyfile("./bin/srsds", srsds)
+	os.chmod(srsds, 0755)
+except:
+	pass
+
+try:
+	shutil.copyfile("./bin/scratch-pirs", scratch)
+	os.chmod(scratch, 0755)
+except:
+	pass
+

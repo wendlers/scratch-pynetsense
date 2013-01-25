@@ -1,0 +1,9 @@
+#!/bin/sh
+
+##
+# start Scratch with Pi remote sensor (only useful on Raspberry Pi)
+##
+
+srspid start
+scratch
+srspid stop

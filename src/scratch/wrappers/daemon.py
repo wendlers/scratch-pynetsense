@@ -245,11 +245,9 @@ if __name__=="__main__":
 	# see what command the daemon should performe ...
 	d = Daemon(pidfile=args.pidfile, wrapargs=wa)
 
-	if args.command == "start":
+	# do we need to import the wrapper (only on start/restart)?
+	if args.command == "start" or args.command == "restart":
 
-		sys.stdout.write("Starting SRS daemon\n")
-		logging.info("Starting SRS daemon")
-	
 		w = ("%s" % args.wrapper.replace('#', ' import '))
 
 		try:
@@ -261,23 +259,33 @@ if __name__=="__main__":
 			logging.error("Error while importing wrapper [%s]: %s\n" % (w, e))
 			sys.stderr.write("Error while importing wrapper [%s]: %s\n" % (w, e))
  			sys.exit(1)
-			
+	
+	if args.command == "start":
+
+		sys.stdout.write("Starting SRS daemon\n")
+		logging.info("Starting SRS daemon")
+	
 		if args.foreground:
 			d.run()
 		else:
 			d.start()	
 
 	elif args.command == "stop":
+
 		sys.stdout.write("Stopping SRS daemon\n")
 		logging.info("Stopping SRS daemon")
 		d.stop()	
 
 	elif args.command == "restart":
+
 		sys.stdout.write("Restarting SRS daemon\n")
 		logging.info("Restarting SRS daemon")
+
 		d.restart()	
 
 	elif args.command == "rmpid":
+
 		sys.stdout.write("Removing stall PID: %s\n" % args.pidfile)
+
 		if os.path.exists(args.pidfile):
 			os.remove(args.pidfile)

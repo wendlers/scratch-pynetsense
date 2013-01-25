@@ -1,0 +1,13 @@
+#!/bin/bash
+
+##
+# get location for local python libraries
+##
+PD=$(python -c "from distutils.sysconfig import get_python_lib; print get_python_lib(False, False, '/usr/local')")
+
+##
+# where to find the dummy server 
+##
+SRSD="$PD/scratch/rsdummysrv.py"
+
+python "$SRSD" 

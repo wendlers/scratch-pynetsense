@@ -32,9 +32,26 @@ from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT
 
 class PiRemoteSensor(RemoteSensor):
 
+	__args = None 
+
 	__inputs = []
 
-	def __init__(self, host = DEFAULT_HOST, port = DEFAULT_PORT):
+	def __init__(self, args = {}):
+
+		self.__args = args
+
+		host = DEFAULT_HOST
+
+		if self.__args.has_key('host'):
+			host = self.__args['host']
+
+		port = DEFAULT_PORT
+
+		if self.__args.has_key('port'):
+			try:
+				port = int(self.__args['port'])
+			except:
+				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
 
 		RemoteSensor.__init__(self, host, port)
 
@@ -109,6 +126,11 @@ class PiRemoteSensor(RemoteSensor):
 
 	def serveForever(self):
 
+		logging.info("PiRemoteSensor entering server loop")
+
+		hbCounterMax = 50
+		hbCounter 	 = 0
+
 		try:
 
 			self.connect(True)
@@ -120,6 +142,12 @@ class PiRemoteSensor(RemoteSensor):
 				try:
 					self.__inputMonitor()
 					time.sleep(0.1)
+
+					hbCounter = hbCounter + 1
+
+					if hbCounter == hbCounterMax:
+						hbCounter = 0
+						self.bcastMsg('heartbeat-pi')
 
 				except socket.error as e:
 					logging.warn("Lost connection to Scratch server!")
@@ -133,16 +161,4 @@ class PiRemoteSensor(RemoteSensor):
 
 		finally:
 			GPIO.cleanup()
-
-if __name__=="__main__":
-
-	# Configure logging for RemoteSensor to show DEBUG messages ...
-	logging.basicConfig(
-		level=logging.DEBUG,
-		format='%(asctime)s %(levelname)-8s %(message)s',
-		datefmt='%m-%d %H:%M:%S',
-	)
-
-	pirs = PiRemoteSensor('172.16.100.21')
-	pirs.serveForever()
 

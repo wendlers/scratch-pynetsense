@@ -38,11 +38,11 @@ class Daemon:
 	stdout 			= None
 	stderr			= None
 	pidfile			= None
+	wrapargs		= None
 
-	def __init__(self, 
-					pidfile='/var/run/srsd.pid', 
-					stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
+	def __init__(self, wrapargs = {}, pidfile = '/var/run/srsd.pid', stdin = '/dev/null', stdout = '/dev/null', stderr = '/dev/null'):
 
+		self.wrapargs		= wrapargs
 		self.stdin 			= stdin
 		self.stdout 		= stdout
 		self.stderr 		= stderr
@@ -162,7 +162,7 @@ class Daemon:
 
 		try:
 
-			wrap = WrappedRemoteSensor()
+			wrap = WrappedRemoteSensor(args = self.wrapargs)
 			wrap.serveForever()
 
 		except KeyboardInterrupt:
@@ -181,23 +181,23 @@ if __name__=="__main__":
 	parser.add_argument('command', metavar='COMMAD', type=str, 
 		help='Command to operate the daemon: start, stop, restart, rmpid')
 
-	parser.add_argument('--foreground', dest="foreground", action='store_true', default=False, 
+	parser.add_argument('--foreground', dest='foreground', action='store_true', default=False, 
 		help='Run in foreground, do not fork')
 
-	parser.add_argument('--pid', dest="pidfile", metavar='FILE', default='/var/run/srsd.pid', 
+	parser.add_argument('--pid', dest='pidfile', metavar='FILE', default='/var/run/srsd.pid', 
 		type=str, help='PID file to use')
 
-	parser.add_argument('--log', dest="logfile", metavar='FILE', default='/var/log/srsd.log', 
+	parser.add_argument('--log', dest='logfile', metavar='FILE', default='/var/log/srsd.log', 
 		type=str, help='Logfile to use')
 
-	parser.add_argument('--loglevel', dest="loglevel", metavar='NUMBER', default=10, 
+	parser.add_argument('--loglevel', dest='loglevel', metavar='NUMBER', default='INFO', 
 		type=str, help='Loglevel to use')
 
-	parser.add_argument('--wrap', dest="wrapper", metavar='WRAPPER', 
+	parser.add_argument('--wrap', dest='wrapper', metavar='WRAPPER', 
 		default='scratch.wrappers.mon#MonitoringRemoteSensor', 
 		type=str, help='Wrapper to instanciate with the daemon')
 
-	parser.add_argument('--wrapargs', dest="wrapargs", 
+	parser.add_argument('--wrapargs', metavar='ARGS', dest='wrapargs', type=str,  
 		help='Arguments to pass to wrapper instance for configuration')
 
 	args = parser.parse_args()
@@ -205,16 +205,45 @@ if __name__=="__main__":
 	if not args.command in ['start', 'stop', 'restart', 'rmpid']:
 		sys.stderr.write("Unknown command [%s]\n" % args.command)
  		sys.exit(1)
+	
+	# try to get logger ...
+	try:
+		if args.foreground:
+			logging.basicConfig(
+				level=args.loglevel,
+				format='%(asctime)s %(name)-3s %(levelname)-8s %(message)s',
+				datefmt='%m-%d %H:%M:%S'
+			)
+		else:
+			logging.basicConfig(
+				level=args.loglevel,
+				format='%(asctime)s %(name)-3s %(levelname)-8s %(message)s',
+				datefmt='%m-%d %H:%M:%S',
+				filename=args.logfile,
+				filemode='a'
+			)
+	except Exception as e:
+		sys.stderr.write(e.__str__() + "\n")
+ 		sys.exit(1)
 
-	d = Daemon(pidfile=args.pidfile)
+	# see if we have wrapper arguments ...
+	wa = {}
 
-	logging.basicConfig(
-		level=args.loglevel,
-		format='%(asctime)s %(name)-3s %(levelname)-8s %(message)s',
-		datefmt='%m-%d %H:%M:%S',
-		filename=args.logfile,
-		filemode='a'
-	)
+	try:
+
+		if args.wrapargs:
+			al = args.wrapargs.split(':')
+			
+			for a in al:
+				kv = a.split('=')
+				wa[kv[0].strip()] = kv[1].strip()
+
+	except Exception as e:
+		sys.stderr.write("Invalid wrapper arguments: " + e.__str__() + "\n")
+ 		sys.exit(1)
+	
+	# see what command the daemon should performe ...
+	d = Daemon(pidfile=args.pidfile, wrapargs=wa)
 
 	if args.command == "start":
 

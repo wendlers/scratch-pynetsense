@@ -258,7 +258,7 @@ class RemoteSensor(threading.Thread):
 
 			msg = msg + ' "' + message + '"'
 
-		logging.debug("Sending message: %s" % msg)
+		logging.info("Sending message: %s" % msg)
 
 		RemoteSensor.__sock.sendall(struct.pack('!I', len(msg)))
 		RemoteSensor.__sock.sendall(msg)

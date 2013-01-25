@@ -30,7 +30,7 @@ import RPi.GPIO as GPIO
 
 from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT 
 
-class RPiRemoteSensor(RemoteSensor):
+class PiRemoteSensor(RemoteSensor):
 
 	__inputs = []
 
@@ -143,6 +143,6 @@ if __name__=="__main__":
 		datefmt='%m-%d %H:%M:%S',
 	)
 
-	pirs = RPiRemoteSensor('172.16.100.21')
+	pirs = PiRemoteSensor('172.16.100.21')
 	pirs.serveForever()
 

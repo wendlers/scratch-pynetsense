@@ -30,10 +30,23 @@ import logging
 from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT 
 
 class MonitoringRemoteSensor(RemoteSensor):
+	'''
+	This remote sonsor just listens for sensor updates and messages to 
+	print them to the log. 
+
+	This remote sensor broadcasts a "heartbeat-mon" message every 5sec. to show it is
+	still alive. This is mainly used internally to get aware of connection loss and to initiate 
+	a reconnect. 
+	'''
 
 	__args = None 
 
 	def __init__(self, args = {}):
+		'''
+		Create a new instance of the monitoring remote sensor. 
+
+		@param	args	arguments for the sensor: host and port.
+		'''
 
 		logging.info("MonitoringRemoteSensor initialized")
 		logging.debug("Wrapper arguments: %s" % args)
@@ -61,16 +74,27 @@ class MonitoringRemoteSensor(RemoteSensor):
 	def __updateHandler(self, var, val):
 		'''
 		Handler called for incoming sensor-updates ...
+
+		@param	var		name of variable which was updated
+		@param	val		new value assigned to var
 		'''
+
 		logging.info("Received update: %s = %s" % (var, val))
 
 	def __messageHandler(self, t, msg):
 		'''
 		Handler called for incoming broadcast messages ... 
+
+		@param	t		message type (currently always broadcast)
+		@param	msg		message received
 		'''
+
 		logging.info("Received message: %s" % msg)
 
 	def serveForever(self):
+		'''
+		The remote seonsor server loop.
+		'''
 
 		logging.info("MonitoringRemoteSensor entering server loop")
 

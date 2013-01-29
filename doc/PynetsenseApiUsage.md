@@ -13,15 +13,15 @@ For communicating with Scratch, the API implements the remote sensor protocol [a
 To see, how to install the API and use the tools that come with API, see the [README] (../README.md) that is included.
 
 
-API Usage
----------
+Basic API Usage
+---------------
 
-* Preparations *
+**Preparations**
 
 Before you start using the API, make sure, Scratch is running, and the remote sensor protocol is activated (by using the right click menu on one of the sensor blocks). 
 
 
-* Create a new RemoteSensor *
+**Create a new RemoteSensor**
 
 First, the remote sensor module needs to be imported:
 
@@ -39,7 +39,7 @@ To receive updates and messages, the receiver thread needs to be started:
 	rs.start()
 	
 
-* Using Sensor Values *
+**Using Sensor Values**
 
 Each sensor value is represented by a variable. To introduce a new variable, or assign a new value to a already introduced variable, just assign the desired value to it in the same way as you would do for a class attribut:
 
@@ -53,12 +53,12 @@ Each sensor value is represented by a variable. To introduce a new variable, or 
 	# An yet an other ...
 	rs.values.x = "dynamic sensor-update"
 
-Note: one could use `int`, `float` and `string` as a right-value for a sensor variable. 
+_Note:_ one could use `int`, `float` and `string` as a right-value for a sensor variable. 
 
 At the moment you introcude a new variable it is known to the Scratch sensor server. If a variable known to the server is modified form within Scratch, an sensor-update message is sent to all the connected clients. The python API listens for this messages, and updates the values for already known variables, or creates new varaiables for not knwon varaibles. This, when accessing the value of a variable, it will nor necesarily contain the value you wrote in earlier, but the value last published by the server. 
 
 
-* Broadcast Messages *
+**Broadcast Messages**
 
 To sent a broadcast message use the following call:
 
@@ -66,7 +66,7 @@ To sent a broadcast message use the following call:
 	rs.bcastMsg('foobar')
 
 
-* Register Callback Handlers for incoming Messages *
+**Register Callback Handlers for incoming Messages**
 
 To get notified about incoming broadcast messages or variable updates, register call back handlers:
 
@@ -103,3 +103,8 @@ To get notified about incoming broadcast messages or variable updates, register 
 
 Now, every time a variable gets updated or a new message is received, the corresponding handler is called.
 
+
+Using the Wrapper Framwork
+--------------------------
+
+TODO

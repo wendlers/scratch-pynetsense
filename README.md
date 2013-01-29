@@ -30,8 +30,8 @@ Also messages could be sent from Scratch to remote sensors and vice versa.
 Further Readings
 ----------------
 
-* [Use the Raspberry Pi GPIO Remote Sensor] (./src/RPiGPIORemoteSensor.md)
-* [Write a sensor client by using the API] (./src/PynetsenseApiUsage.md)
+* [Use the Raspberry Pi GPIO Remote Sensor] (./doc/RPiGPIORemoteSensor.md)
+* [Write a Sensor Client by Using the API] (./doc/PynetsenseApiUsage.md)
 
 
 Project Directory Layout

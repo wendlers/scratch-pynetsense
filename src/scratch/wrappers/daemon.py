@@ -33,6 +33,9 @@ import logging
 from signal import SIGTERM 
 
 class Daemon:
+	'''
+	Provide Unix Daemon functionality used to start a certain wrapper in background. 	
+	'''
 
 	stdin			= None
 	stdout 			= None
@@ -41,6 +44,15 @@ class Daemon:
 	wrapargs		= None
 
 	def __init__(self, wrapargs = {}, pidfile = '/var/run/srsd.pid', stdin = '/dev/null', stdout = '/dev/null', stderr = '/dev/null'):
+		'''
+		Construct a new daemon instance.
+
+		@param	wrapargs	argument dictionary passed to wrappers constructor
+		@param	pidfile		pidfile to use for the daemon
+		@param	stdin		where to redirect stdin to 
+		@param	stdout		where to redirect stdout to
+		@param	srderr		where to redirect stderr to
+		'''
 
 		self.wrapargs		= wrapargs
 		self.stdin 			= stdin
@@ -49,6 +61,9 @@ class Daemon:
 		self.pidfile 		= pidfile
 
 	def daemonize(self):
+		'''
+		Operation called for daemonizing the current process (does the double fork magic).
+		'''
 
 		try: 
 
@@ -98,10 +113,16 @@ class Daemon:
 		file(self.pidfile,'w+').write("%s\n" % pid)
 
 	def delpid(self):
+		'''
+		Delete pidfile.
+		'''
 
 		os.remove(self.pidfile)
 
 	def start(self):
+		'''
+		Start a new daemon instance.
+		'''
 
 		# Check for a pidfile to see if the daemon already runs
 		try:
@@ -124,6 +145,9 @@ class Daemon:
 		self.run()
 
 	def stop(self):
+		'''
+		Stop a running daemon instance.
+		'''
 
 		# Get the pid from the pidfile
 		try:
@@ -154,12 +178,20 @@ class Daemon:
 				os.remove(self.pidfile)
 
 	def restart(self):
+		'''
+		Restart a daemon instance by calling stop, then start. 
+		'''
 
 		self.stop()
 		self.start()
 
 	def run(self):
-
+		'''
+		This method is run within the daemon instance. It creates a new instance of 
+		the given wrapper, passes the wrapargs dictionary to it and start the wrappers
+		server loop.
+		'''
+		
 		try:
 
 			wrap = WrappedRemoteSensor(args = self.wrapargs)

@@ -14,6 +14,8 @@ From the Scratch Wiki:
 	Once a connection is established, messages are sent in both directions 
 	over the socket connection.
 
+_Note:_ For a more detailed description of how to [enable/use remote sensors] (http://wiki.scratch.mit.edu/wiki/Remote_Sensor_Connections) see the Scratch Wiki.
+
 In other words, this means, that one could share global Scratch variables among all remote sensor clients connected to Scratch. The same is true for Scratch messages: they are broadcasted to all clients. For example: 
 
 * A remote sensor client instance connects to scratch.

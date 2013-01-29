@@ -23,12 +23,15 @@
 This file provides the main API class for using uSherpa. 
 '''
 
+import os
+import readline
+import atexit
 import threading
 import struct
 import SocketServer
 
-HOST = "localhost"		# hostname/IP on which to listen for client connections
-PORT = 42001			# port on which to listen for client connections 
+HOST = ''		# hostname/IP on which to listen for client connections
+PORT = 42001		# port on which to listen for client connections 
 
 class RemoteSonsorServerRequestHandler(SocketServer.BaseRequestHandler):
 	'''
@@ -49,6 +52,7 @@ class RemoteSonsorServerRequestHandler(SocketServer.BaseRequestHandler):
 
 			if not data:
 				print("\nClient closed connection")
+				RemoteSonsorServerRequestHandler.sock = None
 				break
 
 			(l, ) = struct.unpack('!I', data)
@@ -62,9 +66,24 @@ class SimpleShell:
 	Simple shell for sending test messages to sensor clients.
 	'''
 
+	histfile = None
+
+	def __init__(self):
+
+		# try and get readline history file
+		self.histfile = os.path.join(os.path.expanduser("~"), ".rsdummysrv.hist")
+
+		try:
+		    readline.read_history_file(self.histfile)
+		except:
+		    pass
+
+		# register exit handler to write history file
+		atexit.register(readline.write_history_file, self.histfile)
+
 	def showHelp(self):
 		'''
-		Show usage information (/q command)
+		Show usage information (/h command)
 		'''
 	
 		print("\n\nControll commands:")
@@ -80,20 +99,31 @@ class SimpleShell:
 		'''
 
 		print("\n*** Scratch remote sensor server mock. Use /h for help, /q to quit ***\n")
+		print("Listening for client connections: %s at port %d\n" % (HOST, PORT))
 
 		while True:
 
-			cmd = raw_input("> ")
+			try: 
 
-			if cmd.lower() == '/q':
+				cmd = raw_input("> ")
+
+				if cmd.lower() == '/q':
+					break
+				elif cmd.lower() == '/h':
+					self.showHelp()
+				elif cmd[0:1] == '/':
+					print("Unknown command: %s" % cmd)
+				elif len(cmd) > 0:
+					if RemoteSonsorServerRequestHandler.sock:
+						print("Sending: %s" % cmd)
+						RemoteSonsorServerRequestHandler.sock.sendall(struct.pack('!I', len(cmd)))
+						RemoteSonsorServerRequestHandler.sock.sendall(cmd)	
+					else:
+						print("No client connected, not sending: %s" % cmd)
+
+			except KeyboardInterrupt:
+				print('\n')
 				break
-			elif cmd.lower() == '/h':
-				self.showHelp()
-			elif len(cmd) > 0:
-				print("Sending: %s" % cmd)
-				RemoteSonsorServerRequestHandler.sock.sendall(struct.pack('!I', len(cmd)))
-				RemoteSonsorServerRequestHandler.sock.sendall(cmd)	
-
 try:
 
 	server = SocketServer.TCPServer((HOST, PORT), RemoteSonsorServerRequestHandler)
@@ -110,4 +140,3 @@ try:
 
 except Exception as e:
 	print(e)
-

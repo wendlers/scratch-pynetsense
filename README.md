@@ -32,7 +32,7 @@ Further Readings
 ----------------
 
 * [Use the Raspberry Pi GPIO Remote Sensor] (./scratch-pynetsense/blob/master/doc/RPiGPIORemoteSensor.md)
-* [Write a Sensor Client by Using the API] (./scratch-pynetsense/blob/master/doc/PynetsenseApiUsage.md)
+* [Write a Sensor Client by Using the API]  (./scratch-pynetsense/blob/master/doc/PynetsenseApiUsage.md)
 
 
 Project Directory Layout
@@ -83,7 +83,9 @@ could do the following:
 	. setup.sh
 	python example-src/<ExampleToRun>
 
-Note: you could use the examples against the dummy server implementation provided with this library. To start the dummy server, issue the following from the projects top-level directory (before running the examples):
 
-	python src/scratch/rsdummysrv.py
+Included Tools
+--------------
+
+TODO
 

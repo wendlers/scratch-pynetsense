@@ -1,7 +1,8 @@
 Scratch Networking Sensor Client API for Python
-=============================================================
+===============================================
 15.01.2013 Stefan Wendler
 sw@kaltpost.de
+
 
 Introduction
 ------------
@@ -10,7 +11,7 @@ This document describes how to use the Python API for creating a Scratch Network
 
 For communicating with Scratch, the API implements the remote sensor protocol [as described here] (http://wiki.scratch.mit.edu/wiki/Remote_Sensors_Protocol).  
 
-To see, how to install the API and use the tools that come with API, see the [README] (../README.md) that is included.
+To see, how to install the API see the [README] (../README.md) that is included.
 
 
 Basic API Usage

@@ -33,7 +33,7 @@ Beside providing a simple API to manage messages and variables, a wrapper framew
 Further Readings
 ----------------
 
-* [Use the Raspberry Pi GPIO Remote Sensor] (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/RPiGPIORemoteSensor.md)
+* [Use the Raspberry Pi GPIO Remote Sensor Client] (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/RPiGPIORemoteSensor.md)
 * [Write a Sensor Client by Using the API]  (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/PynetsenseApiUsage.md)
 
 
@@ -84,10 +84,4 @@ could do the following:
 
 	. setenv.sh
 	python example-src/<ExampleToRun>
-
-
-Included Tools
---------------
-
-TODO
 

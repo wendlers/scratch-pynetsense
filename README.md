@@ -80,7 +80,7 @@ you could run them after you installed the library like this:
 If you prefer running the examples from the project directory (without installing the library), you 
 could do the following:
 
-	. setup.sh
+	. setenv.sh
 	python example-src/<ExampleToRun>
 
 

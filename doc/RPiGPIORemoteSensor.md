@@ -84,6 +84,6 @@ Thus, to read the value of a port from Scratch, insert the sensor value block an
 _Hint:_ to check in scratch for changed input ports, listen to the message "input-changed", and at the moment the message was received, check if the port of interest changed. This is much more efficent then polling a port variable directely in a loop.
 
 
-**Sensor Client Hear-Beat**
+**Sensor Client Heart-Beat**
 
 Additonally, this remote sensor broadcasts a "heartbeat-pi" message every 5sec. to show it is still alive. This is mainly used internally to get aware of connection loss and to initiate a reconnect. 

@@ -67,7 +67,7 @@ E.g. to make IO port 24 an input, go to to "variables" in Scratch and define a n
 _Note:_ by default, all ports are configured as inputs, thus, you do not need to assigne 0 to them.
 
 
-**Set(Get the Value of a Port**
+**Set/Get the Value of a Port**
 
 To set/get the current value (high/low) of an port, use the following variables:
 

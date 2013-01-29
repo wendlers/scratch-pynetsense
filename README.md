@@ -18,14 +18,15 @@ In other words, this means, that one could share global Scratch variables among 
 
 * A remote sensor client instance connects to scratch.
 * The user defines a global variable X in Scratch and assigns the value 1 to it.
-* This  results in a sensor update message sent to the client notifying it, that there is a variable X with a value of 1 assigned to it.
+* This results in a sensor update message send to all clients notifying them, that there is a variable X with a value of 1 assigned to it.
 
-Note: it is also possible that the client introduces a new variable and assigns a value to it. The variable will be  introduced to Scratch by an update message.
+_Note:_ it is also possible that the client introduces a new variable and assigns a value to it. The variable will be  introduced to Scratch by an update message.
 
 An update message is sent every time the value of the variable changed  by the client or by the server (Scratch).
 
 Also messages could be sent from Scratch to remote sensors and vice versa. 
 
+Beside providing a simple API to manage messages and variables, a wrapper framework is provided. The wrapper framework helps with implementing sensor clients that run in the background as daemons. Currently there is a full featured wrapper included for wrapping the GPIOs of an Raspberry Pi into an Scratch remote sensor client. This allows one to access the GPIOs of the Pi from Scratch by simply setting/getting some global varables.
 
 Further Readings
 ----------------

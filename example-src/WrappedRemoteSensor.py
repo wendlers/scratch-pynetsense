@@ -38,7 +38,7 @@ class WrappedRemoteSensor(RemoteSensor):
 
 	To start this sensor, pass it as a wrapper to the wrapper daemon:
 
-	export PYTHONPATH=./src:./example-src
+	source setenv.sh
 	python src/scratch/wrappers/daemon.py --foreground --loglevel DEBUG \
 		   --wrap WrappedRemoteSensor#WrappedRemoteSensor start	
 	'''
@@ -89,6 +89,8 @@ class WrappedRemoteSensor(RemoteSensor):
 				k = w[0].strip().lower()
 				v = int(w[1].strip().split(' ')[0])
 
+				changed = False
+
 				# this are the only field we are interested in
 				if k in [ 'memtotal', 'memfree']:
 					try:
@@ -98,7 +100,11 @@ class WrappedRemoteSensor(RemoteSensor):
 					except:
 						pass
 
+					changed = True
 					self.values.set(k, v)
+
+				if changed:
+					self.bcastMsg('input-changed')
 
 		except Exception as e:
 			logging.error(e)

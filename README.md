@@ -34,7 +34,9 @@ Further Readings
 ----------------
 
 * [Use the Raspberry Pi GPIO Remote Sensor Client] (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/RPiGPIORemoteSensor.md)
-* [Write a Sensor Client by Using the API]  (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/PynetsenseApiUsage.md)
+* [Write a Sensor Client by Using the API] (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/PynetsenseApiUsage.md)
+
+* [Using the Tools that come with this API] (https://github.com/wendlers/scratch-pynetsense/blob/master/doc/PynetsenseTools.md)
 
 
 Project Directory Layout

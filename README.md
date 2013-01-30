@@ -3,6 +3,10 @@ Scratch Networking Sensor Client Library for Python
 15.01.2013 Stefan Wendler
 sw@kaltpost.de
 
+
+Introduction
+------------
+
 This python library provides a simple to use API for implementing [Scratch] (http://scratch.mit.edu/) networking sensor clients. For communicating with Scratch, the [remote sensor protocol is used] (http://wiki.scratch.mit.edu/wiki/Remote_Sensors_Protocol).  
 
 From the Scratch Wiki:

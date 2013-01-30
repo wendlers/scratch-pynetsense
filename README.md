@@ -28,7 +28,7 @@ An update message is sent every time the value of the variable changed  by the c
 
 Also messages could be sent from Scratch to remote sensors and vice versa. 
 
-Beside providing a simple API to manage messages and variables, a wrapper framework is provided. The wrapper framework helps with implementing sensor clients that run in the background as daemons. Currently there is a full featured wrapper included for wrapping the GPIOs of an Raspberry Pi into an Scratch remote sensor client. This allows one to access the GPIOs of the Pi from Scratch by simply setting/getting some global varables.
+Beside providing a simple API to manage messages and variables, a wrapper framework is provided. The wrapper framework helps with implementing sensor clients that run in the background as daemons. Currently there is a full featured wrapper included for wrapping the GPIOs of an Raspberry Pi into an Scratch remote sensor client. This allows one to access the GPIOs of the Pi from Scratch by simply setting/getting some global variables.
 
 Further Readings
 ----------------

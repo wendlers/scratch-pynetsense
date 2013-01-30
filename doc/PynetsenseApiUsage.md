@@ -42,7 +42,7 @@ To receive updates and messages, the receiver thread needs to be started:
 
 **Using Sensor Values**
 
-Each sensor value is represented by a variable. To introduce a new variable, or assign a new value to a already introduced variable, just assign the desired value to it in the same way as you would do for a class attribut:
+Each sensor value is represented by a variable. To introduce a new variable, or assign a new value to a already introduced variable, just assign the desired value to it in the same way as you would do for a class attribute:
 
 	# Create new sensor variable 'a', set value to 1. This will result
     # in a 'sensor-update' message sent to Scratch sensor server. 
@@ -56,7 +56,7 @@ Each sensor value is represented by a variable. To introduce a new variable, or 
 
 _Note:_ one could use `int`, `float` and `string` as a right-value for a sensor variable. 
 
-At the moment you introcude a new variable it is known to the Scratch sensor server. If a variable known to the server is modified form within Scratch, an sensor-update message is sent to all the connected clients. The python API listens for this messages, and updates the values for already known variables, or creates new varaiables for not knwon varaibles. This, when accessing the value of a variable, it will nor necesarily contain the value you wrote in earlier, but the value last published by the server. 
+At the moment you introduce a new variable it is known to the Scratch sensor server. If a variable known to the server is modified form within Scratch, an sensor-update message is sent to all the connected clients. The python API listens for this messages, and updates the values for already known variables, or creates new variables for not known variables. This, when accessing the value of a variable, it will nor necessarily contain the value you wrote in earlier, but the value last published by the server. 
 
 
 **Broadcast Messages**
@@ -67,7 +67,7 @@ To sent a broadcast message use the following call:
 	rs.bcastMsg('foobar')
 
 
-**Register Callback Handlers for incoming Messages**
+**Register Call-back Handlers for incoming Messages**
 
 To get notified about incoming broadcast messages or variable updates, register call back handlers:
 
@@ -105,7 +105,7 @@ To get notified about incoming broadcast messages or variable updates, register 
 Now, every time a variable gets updated or a new message is received, the corresponding handler is called.
 
 
-Using the Wrapper Framwork
+Using the Wrapper Framework
 --------------------------
 
 TODO

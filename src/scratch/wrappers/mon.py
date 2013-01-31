@@ -44,14 +44,14 @@ class MonitoringRemoteSensor(RemoteSensor):
 	# sensor name e.g. to use in heart-beat
 	name = "mon"
 
-	def __init__(self, args = {}):
+	def __init__(self, myArgs = {}):
 		'''
 		Create a new instance of the monitoring remote sensor. 
 
-		@param	args	arguments for the sensor: host and port.
+		@param	myArgs	arguments for the sensor: host and port.
 		'''
 
-		RemoteSensor.__init__(self, args)
+		RemoteSensor.__init__(self, args = myArgs)
 
 		self.updateHandler  = self.__updateHandler
 		self.messageHandler = self.__messageHandler

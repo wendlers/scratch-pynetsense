@@ -48,14 +48,14 @@ class WrappedRemoteSensor(RemoteSensor):
 	# name used e.g. for heartbeat
 	name = "wrap"
 
-	def __init__(self, args = {}):
+	def __init__(self, myArgs = {}):
 		'''
 		Create a new instance of the monitoring remote sensor. 
 
-		@param	args	arguments for the sensor: host and port.
+		@param	myArgs	arguments for the sensor: host and port.
 		'''
 
-		RemoteSensor.__init__(self, args)
+		RemoteSensor.__init__(self, args = myArgs)
 
 	def worker(self):
 		'''

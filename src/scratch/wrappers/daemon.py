@@ -197,7 +197,7 @@ class Daemon:
 
 		try:
 
-			wrap = WrappedRemoteSensor(args = self.wrapargs)
+			wrap = WrappedRemoteSensor(self.wrapargs)
 
 			logging.info("WreppedRemoteSensor entering server loop")
 

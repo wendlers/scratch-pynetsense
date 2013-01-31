@@ -162,13 +162,13 @@ class RemoteSensor(threading.Thread):
 		host = DEFAULT_HOST
 
 		if self.__args.has_key('host'):
-			self.host = self.__args['host']
+			self.__host = self.__args['host']
 
 		port = DEFAULT_PORT
 
 		if self.__args.has_key('port'):
 			try:
-				self.port = int(self.__args['port'])
+				self.__port = int(self.__args['port'])
 			except:
 				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
 

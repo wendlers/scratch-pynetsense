@@ -139,13 +139,14 @@ class RemoteSensor(threading.Thread):
 	__stopRcvThread = None	# Controll flag for receiver thread 
 	__host			= None	# Sensor server host
 	__port			= None	# Sensor server port
+	__args 			= None 	# additional wrapper arguments
 
 	values 			= None	# holds an instance of @SensorValues
 
 	updateHandler  = None	# Call back handler for sensor updates
 	messageHandler = None	# Call back handler for message updates
 
-	def __init__(self, host = DEFAULT_HOST, port = DEFAULT_PORT):
+	def __init__(self, host = DEFAULT_HOST, port = DEFAULT_PORT, args = {}):
 		'''
 		Construct new remote sensor connected to given server on given port.
 		If server is not reachable, an exception is thrown.
@@ -156,13 +157,33 @@ class RemoteSensor(threading.Thread):
 
 		self.__host = host
 		self.__port = port
-	
+		self.__args = args
+
+		host = DEFAULT_HOST
+
+		if self.__args.has_key('host'):
+			self.host = self.__args['host']
+
+		port = DEFAULT_PORT
+
+		if self.__args.has_key('port'):
+			try:
+				self.port = int(self.__args['port'])
+			except:
+				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
+
 		threading.Thread.__init__(self)
 		self.daemon = True
 
 		self.values = SensorValues(self)
 
 	def connect(self, tryHard = False):
+		'''
+		Try to connect to a sensor server. If tryHard is set, it will retry forever to connect
+		to the server.
+
+		@param	tryHard		on True, try connect over and over again 
+		'''
 
 		logging.info("Connecting to Scratch at %s:%d" % (self.__host, self.__port))
 
@@ -189,7 +210,10 @@ class RemoteSensor(threading.Thread):
 		logging.info("Successfully connected!")
 
 	def shutdown(self):
-	
+		'''
+		Shutdown remote sensor connection
+		'''	
+
 		if self.__stopRcvThread == None:
 			return
 

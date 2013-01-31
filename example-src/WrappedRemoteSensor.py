@@ -45,6 +45,9 @@ class WrappedRemoteSensor(RemoteSensor):
 
 	__args = None 
 
+	# name used e.g. for heartbeat
+	name = "wrap"
+
 	def __init__(self, args = {}):
 		'''
 		Create a new instance of the monitoring remote sensor. 
@@ -52,27 +55,9 @@ class WrappedRemoteSensor(RemoteSensor):
 		@param	args	arguments for the sensor: host and port.
 		'''
 
-		logging.info("WrappedRemoteSensor initialized")
-		logging.debug("Wrapper arguments: %s" % args)
+		RemoteSensor.__init__(self, args)
 
-		self.__args = args
-
-		host = DEFAULT_HOST
-
-		if self.__args.has_key('host'):
-			host = self.__args['host']
-
-		port = DEFAULT_PORT
-
-		if self.__args.has_key('port'):
-			try:
-				port = int(self.__args['port'])
-			except:
-				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
-
-		RemoteSensor.__init__(self, host, port)
-
-	def __readProcMem(self):
+	def worker(self):
 		'''
 		Read memory info from proc filesystem (memtotal and memfree). If the
 		value changed, send a sensor-update message to the server.
@@ -106,45 +91,6 @@ class WrappedRemoteSensor(RemoteSensor):
 				if changed:
 					self.bcastMsg('input-changed')
 
-		except Exception as e:
-			logging.error(e)
-
-	def serveForever(self):
-		'''
-		The remote seonsor server loop.
-		'''
-
-		logging.info("WreppedRemoteSensor entering server loop")
-
-		hbCounterMax = 50
-		hbCounter 	 = 0
-
-		try:
-
-			self.connect(True)
-			self.start()
-
-			while True:
-
-				try:
-					time.sleep(0.1)
-
-					hbCounter = hbCounter + 1
-
-					# read meminfo from proc filesystem
-					self.__readProcMem()
-
-					if hbCounter == hbCounterMax:
-						hbCounter = 0
-						self.bcastMsg('heartbeat-wrap')
-
-				except socket.error as e:
-					logging.warn("Lost connection to Scratch server!")
-					self.connect(True)
-
-				except KeyboardInterrupt:
-					break
-			
 		except Exception as e:
 			logging.error(e)
 

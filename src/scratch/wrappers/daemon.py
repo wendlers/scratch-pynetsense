@@ -29,6 +29,7 @@ import time
 import atexit
 import argparse
 import logging
+import socket
 
 from signal import SIGTERM 
 
@@ -192,19 +193,46 @@ class Daemon:
 		server loop.
 		'''
 		
+		wrap = None
+
 		try:
 
 			wrap = WrappedRemoteSensor(args = self.wrapargs)
-			wrap.serveForever()
 
-		except KeyboardInterrupt:
-		
-			pass
+			logging.info("WreppedRemoteSensor entering server loop")
 
+			hbCounterMax = 50
+			hbCounter 	 = 0
+
+			wrap.connect(True)
+			wrap.start()
+
+			while True:
+
+				try:
+					time.sleep(0.1)
+
+					hbCounter = hbCounter + 1
+
+					# read meminfo from proc filesystem
+					wrap.worker()
+
+					if hbCounter == hbCounterMax:
+						hbCounter = 0
+						wrap.bcastMsg("heartbeat-%s" % wrap.name)
+
+				except socket.error as e:
+					logging.warn("Lost connection to Scratch server!")
+					wrap.connect(True)
+
+				except KeyboardInterrupt:
+					break
+			
 		except Exception as e:
-
 			logging.error(e)
 
+		finally:
+			del wrap
 
 if __name__=="__main__":
 

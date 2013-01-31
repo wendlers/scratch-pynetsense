@@ -41,6 +41,9 @@ class MonitoringRemoteSensor(RemoteSensor):
 
 	__args = None 
 
+	# sensor name e.g. to use in heart-beat
+	name = "mon"
+
 	def __init__(self, args = {}):
 		'''
 		Create a new instance of the monitoring remote sensor. 
@@ -48,25 +51,7 @@ class MonitoringRemoteSensor(RemoteSensor):
 		@param	args	arguments for the sensor: host and port.
 		'''
 
-		logging.info("MonitoringRemoteSensor initialized")
-		logging.debug("Wrapper arguments: %s" % args)
-
-		self.__args = args
-
-		host = DEFAULT_HOST
-
-		if self.__args.has_key('host'):
-			host = self.__args['host']
-
-		port = DEFAULT_PORT
-
-		if self.__args.has_key('port'):
-			try:
-				port = int(self.__args['port'])
-			except:
-				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
-
-		RemoteSensor.__init__(self, host, port)
+		RemoteSensor.__init__(self, args)
 
 		self.updateHandler  = self.__updateHandler
 		self.messageHandler = self.__messageHandler
@@ -91,39 +76,8 @@ class MonitoringRemoteSensor(RemoteSensor):
 
 		logging.info("Received message: %s" % msg)
 
-	def serveForever(self):
+	def worker(self):
 		'''
-		The remote seonsor server loop.
+		The remote seonsor worker.
 		'''
-
-		logging.info("MonitoringRemoteSensor entering server loop")
-
-		hbCounterMax = 50
-		hbCounter 	 = 0
-
-		try:
-
-			self.connect(True)
-			self.start()
-
-			while True:
-
-				try:
-					time.sleep(0.1)
-
-					hbCounter = hbCounter + 1
-
-					if hbCounter == hbCounterMax:
-						hbCounter = 0
-						self.bcastMsg('heartbeat-mon')
-
-				except socket.error as e:
-					logging.warn("Lost connection to Scratch server!")
-					self.connect(True)
-
-				except KeyboardInterrupt:
-					break
-			
-		except Exception as e:
-			logging.error(e)
-
+		pass

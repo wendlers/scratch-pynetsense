@@ -81,6 +81,9 @@ class PiRemoteSensor(RemoteSensor):
 	__args 		= None 
 	__inputs 	= []
 
+	# sensor name e.g. to use in heart-beat
+	name = "pi"
+
 	def __init__(self, args = {}):
 		'''
 		Create a new instance of the monitoring remote sensor. 
@@ -88,24 +91,19 @@ class PiRemoteSensor(RemoteSensor):
 		@param	args	arguments for the sensor: host and port.
 		'''
 
-		self.__args = args
-
-		host = DEFAULT_HOST
-
-		if self.__args.has_key('host'):
-			host = self.__args['host']
-
-		port = DEFAULT_PORT
-
-		if self.__args.has_key('port'):
-			try:
-				port = int(self.__args['port'])
-			except:
-				logging.warn("Invalid port [%s] ignored" % self.__args['port'])
-
-		RemoteSensor.__init__(self, host, port)
+		RemoteSensor.__init__(self, args)
 
 		self.updateHandler = self.__updateHandler
+
+	def __del__(self):
+		'''	
+		Release GPIOs
+		'''
+
+		try:
+			GPIO.cleanup()
+		except:
+			pass
 
 	def __setupPins(self):
 		'''
@@ -124,26 +122,6 @@ class PiRemoteSensor(RemoteSensor):
 			self.values.set("DIO%d" % pin, 0)
 			self.values.set("IO%d" % pin, 0)
 				
-	def __inputMonitor(self):
-		'''
-		Check all ports which are configured as input for state change. If a 
-		state change was detected report the change through a sensor-update message.
-		Also a "input-changed" message is broadcasted.
-		'''
-	
-		changed = False
-
-		for pin in self.__inputs:
-
-			i = GPIO.input(pin)
-
-			if i != self.values.get("IO%d" % pin):
-				self.values.set("IO%d" % pin, i)
-				changed = True
-
-		if changed:
-			self.bcastMsg("input-changed")
-
 	def __updateHandler(self, var, val):
 		'''
 		Handler called for incoming sensor-updates ...
@@ -187,44 +165,23 @@ class PiRemoteSensor(RemoteSensor):
 		else:
 			logging.warn("Allowed value for %s is only 0 or 1 (was %s)" % (val, vu))
 
-	def serveForever(self):
+	def worker(self):
 		'''
-		The remote seonsor server loop.
+		Check all ports which are configured as input for state change. If a 
+		state change was detected report the change through a sensor-update message.
+		Also a "input-changed" message is broadcasted.
 		'''
+	
+		changed = False
 
-		logging.info("PiRemoteSensor entering server loop")
+		for pin in self.__inputs:
 
-		hbCounterMax = 50
-		hbCounter 	 = 0
+			i = GPIO.input(pin)
 
-		try:
+			if i != self.values.get("IO%d" % pin):
+				self.values.set("IO%d" % pin, i)
+				changed = True
 
-			self.connect(True)
-			self.__setupPins()
-			self.start()
-
-			while True:
-
-				try:
-					self.__inputMonitor()
-					time.sleep(0.1)
-
-					hbCounter = hbCounter + 1
-
-					if hbCounter == hbCounterMax:
-						hbCounter = 0
-						self.bcastMsg('heartbeat-pi')
-
-				except socket.error as e:
-					logging.warn("Lost connection to Scratch server!")
-					self.connect(True)
-
-				except KeyboardInterrupt:
-					break
-			
-		except Exception as e:
-			logging.error(e)
-
-		finally:
-			GPIO.cleanup()
+		if changed:
+			self.bcastMsg("input-changed")
 

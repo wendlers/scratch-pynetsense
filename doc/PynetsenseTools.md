@@ -1,7 +1,6 @@
 Scratch Networking Sensor Client Library Tools
 ===============================================
-30.01.2013 Stefan Wendler
-sw@kaltpost.de
+30.01.2013 Stefan Wendler - [kaltpost.de] (http://kaltpost.de)
 
 
 Introduction

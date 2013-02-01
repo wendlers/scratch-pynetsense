@@ -60,6 +60,7 @@ To use this Scratch remote sensor protocol library, Scratch in a version >= 1.3 
 If you are going to run Scratch and the remote sensors on different machines, make sure
 the machines are accessible through networking.  
 
+The Python API needs Python 2.7.
 
 Install the Library
 -------------------

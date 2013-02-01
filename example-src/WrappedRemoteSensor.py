@@ -69,27 +69,20 @@ class WrappedRemoteSensor(RemoteSensor):
 			lines = f.readlines()
 			f.close()
 
+			changed = False
+
 			for l in lines:
 				w = l.split(':')
 				k = w[0].strip().lower()
 				v = int(w[1].strip().split(' ')[0])
 
-				changed = False
-
 				# this are the only field we are interested in
 				if k in [ 'memtotal', 'memfree']:
-					try:
-						# if value is unchanged, don't update it
-						if self.values.get(k) == v:
-							continue
-					except:
-						pass
+					if self.values.set(k, v):
+						changed = True
 
-					changed = True
-					self.values.set(k, v)
-
-				if changed:
-					self.bcastMsg('input-changed')
+			if changed:
+				self.bcastMsg('input-changed')
 
 		except Exception as e:
 			logging.error(e)

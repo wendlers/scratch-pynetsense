@@ -78,7 +78,6 @@ class PiRemoteSensor(RemoteSensor):
 	a reconnect. 
 	'''
 
-	__args 		= None 
 	__inputs 	= []
 
 	# sensor name e.g. to use in heart-beat
@@ -178,8 +177,7 @@ class PiRemoteSensor(RemoteSensor):
 
 			i = GPIO.input(pin)
 
-			if i != self.values.get("IO%d" % pin):
-				self.values.set("IO%d" % pin, i)
+			if self.values.set("IO%d" % pin, i):
 				changed = True
 
 		if changed:

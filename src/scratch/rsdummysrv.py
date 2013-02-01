@@ -59,7 +59,7 @@ class RemoteSonsorServerRequestHandler(SocketServer.BaseRequestHandler):
 			
 			data = self.request.recv(l)
 
-			print("\nReceived message of lenght %d from %s: %s" % (l, self.client_address[0], data))
+			print("Received message of lenght %d from %s: %s" % (l, self.client_address[0], data))
 	
 class SimpleShell:
 	'''

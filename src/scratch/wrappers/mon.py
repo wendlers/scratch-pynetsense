@@ -39,8 +39,6 @@ class MonitoringRemoteSensor(RemoteSensor):
 	a reconnect. 
 	'''
 
-	__args = None 
-
 	# sensor name e.g. to use in heart-beat
 	name = "mon"
 

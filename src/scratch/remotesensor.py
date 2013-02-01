@@ -110,14 +110,25 @@ class SensorValues:
 		'''
 		Set value of a named variable, decide if update message is sent or not.
 
-		@param	name			name of variable to assign a value
-		@param	value			value to be assigned
+		@param	name		name of variable to assign a value
+		@param	value		value to be assigned
 		@param	updateRemote	if True, send update message
+		@return			if value was set True, otherwise False
 		'''
+
+		# see if we really need to change the value
+		try:
+			if self.__dict__[name] == value:
+				return False
+		except:
+			pass
+
 		self.__setInternal(name, value)
 
 		if updateRemote:
 			self.sensorClient.sendMsg('sensor-update', varName=name, varValue=value)
+
+		return True
 		
 	def get(self, name):
 		'''
@@ -142,6 +153,8 @@ class RemoteSensor(threading.Thread):
 	__args 			= None 	# additional wrapper arguments
 
 	values 			= None	# holds an instance of @SensorValues
+
+	name 			= "sensor"
 
 	updateHandler  = None	# Call back handler for sensor updates
 	messageHandler = None	# Call back handler for message updates

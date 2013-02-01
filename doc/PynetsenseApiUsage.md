@@ -1,7 +1,6 @@
 Scratch Networking Sensor Client API for Python
 ===============================================
-15.01.2013 Stefan Wendler
-sw@kaltpost.de
+15.01.2013 Stefan Wendler - [kaltpost.de] (http://kaltpost.de)
 
 
 Introduction

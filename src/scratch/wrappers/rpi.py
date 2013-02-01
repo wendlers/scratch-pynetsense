@@ -24,8 +24,6 @@ This file is part of the Scratch Remote Sensor Library project
 '''
 
 import logging
-import time
-import socket
 import RPi.GPIO as GPIO
 
 from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT 

@@ -23,8 +23,6 @@
 This file is part of the Scratch Remote Sensor Library project
 '''
 
-import time
-import socket
 import logging
 
 from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT 

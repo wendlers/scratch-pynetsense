@@ -1,7 +1,6 @@
 Use the Raspberry Pi GPIO Remote Sensor Client
 ==============================================
-15.01.2013 Stefan Wendler
-sw@kaltpost.de
+15.01.2013 Stefan Wendler - [kaltpost.de] (http://kaltpost.de)
 
 
 Introduction

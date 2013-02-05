@@ -90,6 +90,8 @@ class PiRemoteSensor(RemoteSensor):
 
 		RemoteSensor.__init__(self, args = myArgs)
 
+		self.__setupPins()
+
 		self.updateHandler = self.__updateHandler
 
 	def __del__(self):

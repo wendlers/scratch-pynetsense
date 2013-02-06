@@ -30,8 +30,9 @@ from scratch.remotesensor import RemoteSensor, DEFAULT_HOST, DEFAULT_PORT
 
 class DummyVehicle:
 
-	def fw(self):
-		logging.debug("DummyVehicle: fw")
+	def fw(self, count):
+		logging.debug("DummyVehicle: fw(%d)" % count)
+		return True
 	
 	def br(self):
 		logging.debug("DummyVehicle: br")
@@ -39,11 +40,19 @@ class DummyVehicle:
 	def tr(self, deg):
 		logging.debug("DummyVehicle: tr for %d deg." % deg)
 
+	
+class DummyPanRf:
+
+	def rangeAt(self, deg):
+		logging.debug("DummyVehicle: rangeAt for %d deg." % deg)
+		return deg + 1
+
 class DummyBot:
 
 	def __init__(self, sherpaPort, advaced = False):
 
 		self.vehicle = DummyVehicle()
+		self.panrf	 = DummyPanRf()
 
 		logging.debug("Starting dummy bot with sherpaPort %s" % sherpaPort)
 	
@@ -70,8 +79,15 @@ class CarambotRemoteSensor(RemoteSensor):
 		if myArgs.has_key('sherpaPort'):
 			sherpaPort = myArgs['sherpaPort']
 
-		# self.robot = Robot(sherpaPort, True)
-		self.robot = DummyBot(sherpaPort, True)
+		dummyBot = False
+	
+		if myArgs.has_key('dummyBot') and myArgs['dummyBot'].lower() == 'true':
+			dummyBot = True
+
+		if dummyBot:
+			self.robot = DummyBot(sherpaPort, True)
+		else:
+			self.robot = Robot(sherpaPort, True)
  
 		RemoteSensor.__init__(self, args = myArgs)
 
@@ -98,26 +114,35 @@ class CarambotRemoteSensor(RemoteSensor):
 
 		logging.info("Received message: %s" % msg)
 
-		if msg == "move": 
-			logging.debug("move")	
-			self.robot.vehicle.fw()
+		if msg == "forward": 
+
+			full = self.robot.vehicle.fw(self.values.moveticks)
+			if not full:
+				self.bcastMsg('obstacle-detected')
+
 		elif msg == "stop": 
-			logging.debug("stop")	
+
 			self.robot.vehicle.br()
-		elif msg == "turnleft-45": 
-			logging.debug("turnleft-45")	
-			self.robot.vehicle.tr(45)
-		elif msg == "turnleft-90": 
-			logging.debug("turnleft-90")	
-			self.robot.vehicle.tr(90)
-		elif msg == "turnright-45": 
-			logging.debug("turnright-45")	
-			self.robot.vehicle.tr(-45)
-		elif msg == "turnright-90": 
-			logging.debug("turnright-90")	
-			self.robot.vehicle.tr(-90)
+
+		elif msg == "turn": 
+
+			self.robot.vehicle.tr(self.values.turndeg)
+
+		elif msg == "range": 
+
+			self.values.range = self.robot.panrf.rangeAt(self.values.rangedeg)
+			self.bcastMsg('range-updated')
+
 		else:
+
 			logging.warn("Unknown message: %s" % msg)	
+
+	def setupVariables(self):
+
+		self.values.forwardticks 	= 0
+		self.values.turndeg 		= 0
+		self.values.rangedeg 		= 0
+		self.values.range	 		= 0
 
 	def worker(self):
 		'''

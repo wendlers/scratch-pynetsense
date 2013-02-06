@@ -90,8 +90,6 @@ class PiRemoteSensor(RemoteSensor):
 
 		RemoteSensor.__init__(self, args = myArgs)
 
-		self.__setupPins()
-
 		self.updateHandler = self.__updateHandler
 
 	def __del__(self):
@@ -103,24 +101,7 @@ class PiRemoteSensor(RemoteSensor):
 			GPIO.cleanup()
 		except:
 			pass
-
-	def __setupPins(self):
-		'''
-		Initially setup the pins (all OUTPUT). This also sends the sensor-update
-		message to the server to anounce in which state the pins are. 
-		'''
-		
-		GPIO.setmode(GPIO.BCM)
-
-		self.__inputs = []
-
-		for pin in [ 4, 17, 18, 21, 22, 23, 24, 25 ]:
-
-			GPIO.setup(pin, GPIO.OUT)	
-			GPIO.output(pin, GPIO.LOW)
-			self.values.set("DIO%d" % pin, 0)
-			self.values.set("IO%d" % pin, 0)
-				
+			
 	def __updateHandler(self, var, val):
 		'''
 		Handler called for incoming sensor-updates ...
@@ -164,6 +145,23 @@ class PiRemoteSensor(RemoteSensor):
 		else:
 			logging.warn("Allowed value for %s is only 0 or 1 (was %s)" % (val, vu))
 
+	def setupVariables(self):
+		'''
+		Initially setup the pins (all OUTPUT). This also sends the sensor-update
+		message to the server to anounce in which state the pins are. 
+		'''
+		
+		GPIO.setmode(GPIO.BCM)
+
+		self.__inputs = []
+
+		for pin in [ 4, 17, 18, 21, 22, 23, 24, 25 ]:
+
+			GPIO.setup(pin, GPIO.OUT)	
+			GPIO.output(pin, GPIO.LOW)
+			self.values.set("DIO%d" % pin, 0)
+			self.values.set("IO%d" % pin, 0)
+	
 	def worker(self):
 		'''
 		Check all ports which are configured as input for state change. If a 

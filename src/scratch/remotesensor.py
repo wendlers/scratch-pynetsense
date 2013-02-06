@@ -190,6 +190,29 @@ class RemoteSensor(threading.Thread):
 
 		self.values = SensorValues(self)
 
+	def __del__(self):
+		'''
+		Destructor for remote sensor
+		'''
+
+		try:
+			RemoteSensor.__sock.close()
+		except:
+			pass
+
+	def setupVariables(self):
+		'''
+		Overwrite this method to initialize remote sensor variables on every connect.
+		'''
+		pass
+
+	def worker(self):
+		'''
+		This method is called in an endless loop when the sensor is running and connected. 
+		Put your sensor worker code in here (e.g. read out the sensors). 
+		'''
+		pass
+
 	def connect(self, tryHard = False):
 		'''
 		Try to connect to a sensor server. If tryHard is set, it will retry forever to connect
@@ -222,6 +245,9 @@ class RemoteSensor(threading.Thread):
 
 		logging.info("Successfully connected!")
 
+		# initially setup variables
+		self.setupVariables()
+
 	def shutdown(self):
 		'''
 		Shutdown remote sensor connection
@@ -237,16 +263,6 @@ class RemoteSensor(threading.Thread):
 		try:
 			self.__sock.shutdown()
 			self.__sock.close()
-		except:
-			pass
-
-	def __del__(self):
-		'''
-		Destructor for remote sensor
-		'''
-
-		try:
-			RemoteSensor.__sock.close()
 		except:
 			pass
 
